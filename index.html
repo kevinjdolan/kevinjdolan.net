@@ -1,0 +1,1703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kevin J. Dolan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: oklch(0.10 0.025 275);
+    --bg-1: oklch(0.14 0.04 285);
+    --ink: oklch(0.97 0.01 320);
+    --ink-dim: oklch(0.78 0.02 320);
+    --ink-mute: oklch(0.58 0.03 300);
+    --pink: oklch(0.70 0.22 340);
+    --pink-soft: oklch(0.62 0.18 340);
+    --purple: oklch(0.55 0.18 305);
+    --blue: oklch(0.66 0.18 250);
+    --blue-soft: oklch(0.58 0.16 250);
+    --line: oklch(0.30 0.04 285 / 0.6);
+    --glass: oklch(0.22 0.04 285 / 0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter Tight", system-ui, sans-serif;
+    background: var(--bg-0);
+    overflow: hidden;
+    height: 100vh;
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Bisexual-lighting ambient backdrop */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(120vmax 120vmax at 50% 50%, oklch(0.20 0.05 285 / 0.0), oklch(0.14 0.04 275 / 0.6));
+    z-index: -3;
+    pointer-events: none;
+  }
+  .bg-stage {
+    position: fixed;
+    inset: -20vmax;
+    z-index: -2;
+    pointer-events: none;
+    overflow: hidden;
+    filter: blur(24px) saturate(1.1);
+  }
+  .bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    will-change: left, top, width, height, opacity, background;
+    mix-blend-mode: screen;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-stage { display: none; }
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(oklch(1 0 0 / 0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    z-index: -1;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* Header */
+  header.site {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    isolation: isolate; /* contain pseudo-element blend modes */
+    /* Frosted yellow-white glass: heavy blur + boosted saturation distorts what's behind,
+       and a tinted backdrop-filter layer washes a warm tone over it without hiding the bg. */
+    backdrop-filter:
+      blur(28px)
+      saturate(1.8)
+      brightness(1.15)
+      contrast(0.95);
+    -webkit-backdrop-filter:
+      blur(28px)
+      saturate(1.8)
+      brightness(1.15)
+      contrast(0.95);
+    /* Layered fill: warm tint + subtle highlight gradient + thin sheen at top edge */
+    background:
+      linear-gradient(180deg,
+        oklch(0.99 0.05 95 / 0.10) 0%,
+        oklch(0.94 0.06 95 / 0.05) 100%),
+      oklch(0.92 0.05 95 / 0.03);
+    border-bottom: 1px solid oklch(0.95 0.04 95 / 0.18);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.22),    /* top sheen */
+      0 4px 12px oklch(0 0 0 / 0.30),       /* close shadow */
+      0 16px 40px oklch(0 0 0 / 0.45),      /* mid shadow */
+      0 32px 80px oklch(0.20 0.10 280 / 0.40); /* far violet bloom */
+  }
+  /* Faceted-glass overlay: two interlocking triangular tessellations create a prism-like
+     surface. The pattern uses repeating conic-gradients to fake 3D triangle facets each
+     catching light from a different angle. Kept very subtle so it reads as texture. */
+  header.site::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    --t: 26px;
+    background:
+      repeating-conic-gradient(
+        from 30deg at 50% 33.33%,
+        oklch(1 0 0 / 0.10) 0deg 60deg,
+        oklch(0 0 0 / 0.06) 60deg 120deg,
+        oklch(1 0 0 / 0.04) 120deg 180deg,
+        oklch(0 0 0 / 0.10) 180deg 240deg,
+        oklch(1 0 0 / 0.08) 240deg 300deg,
+        oklch(0 0 0 / 0.04) 300deg 360deg
+      ),
+      repeating-conic-gradient(
+        from 90deg at 50% 50%,
+        oklch(1 0 0 / 0.06) 0deg 60deg,
+        oklch(0 0 0 / 0.05) 60deg 120deg,
+        oklch(1 0 0 / 0.03) 120deg 180deg,
+        oklch(0 0 0 / 0.08) 180deg 240deg,
+        oklch(1 0 0 / 0.05) 240deg 300deg,
+        oklch(0 0 0 / 0.03) 300deg 360deg
+      );
+    background-size: var(--t) calc(var(--t) * 0.866), calc(var(--t) * 1.4) calc(var(--t) * 1.21);
+    background-position: 0 0, calc(var(--t) / 2) calc(var(--t) * 0.43);
+    mix-blend-mode: overlay;
+    opacity: 0.18;
+  }
+  /* Specular sheen + slight refraction streak: a diagonal bright bar suggests the light
+     source above-left, and a subtle SVG micro-noise texture gives the glass surface its
+     hand-blown quality. Sits above the facet pattern. */
+  header.site::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background:
+      /* Diagonal moving sheen — fixed in place but pinned to the bar's long axis */
+      linear-gradient(115deg,
+        transparent 30%,
+        oklch(1 0 0 / 0.08) 45%,
+        oklch(1 0.05 95 / 0.14) 50%,
+        oklch(1 0 0 / 0.08) 55%,
+        transparent 70%
+      ),
+      /* Top-edge highlight that catches light strongly */
+      linear-gradient(180deg,
+        oklch(1 0 0 / 0.12) 0%,
+        transparent 14%,
+        transparent 86%,
+        oklch(0 0 0 / 0.05) 100%
+      ),
+      /* Micro-noise via SVG turbulence — gives the glass a hand-blown grain */
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/></svg>");
+    background-size: 100% 100%, 100% 100%, 180px 180px;
+    mix-blend-mode: soft-light;
+    opacity: 0.55;
+  }
+  /* Make sure the actual content sits above the texture overlays */
+  header.site > * { position: relative; z-index: 3; }
+  .header-inner {
+    max-width: none;
+    margin: 0;
+    padding: 22px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    text-decoration: none;
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 6px 14px 6px 6px;
+    transition: background .2s ease;
+  }
+  .brand:hover { background: oklch(1 0 0 / 0.04); }
+  .brand:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+
+  .avatar {
+    width: 66px;
+    height: 66px;
+    border-radius: 999px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    background:
+      conic-gradient(from 200deg,
+        oklch(0.70 0.22 340) 0deg,
+        oklch(0.55 0.18 305) 120deg,
+        oklch(0.66 0.18 250) 240deg,
+        oklch(0.70 0.22 340) 360deg);
+    padding: 2px;
+    box-shadow:
+      0 0 0 1px oklch(1 0 0 / 0.06),
+      0 4px 18px oklch(0.55 0.20 340 / 0.30),
+      0 4px 18px oklch(0.50 0.18 250 / 0.20);
+  }
+  .avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(140deg, oklch(0.22 0.04 285), oklch(0.18 0.05 270));
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    overflow: hidden;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 999px; }
+
+  .brand-name {
+    font-family: "Bricolage Grotesque", "Inter Tight", sans-serif;
+    font-variation-settings: "opsz" 96;
+    font-weight: 600;
+    font-size: 42px;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: oklch(0.985 0.005 100);
+    text-shadow:
+      0 1px 0 oklch(0 0 0 / 0.55),
+      0 2px 8px oklch(0 0 0 / 0.45),
+      0 6px 22px oklch(0.55 0.18 320 / 0.30);
+  }
+
+  nav.primary {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    /* Yellow-white pill track with a deep inner shadow for a sunken-channel feel. */
+    background: oklch(0.93 0.045 95);
+    border-radius: 999px;
+    padding: 5px;
+    position: relative;
+    box-shadow:
+      inset 0 4px 8px oklch(0 0 0 / 0.30),
+      inset 0 2px 3px oklch(0 0 0 / 0.20),
+      inset 0 -1px 0 oklch(1 0 0 / 0.45),
+      inset 0 0 0 1px oklch(0.80 0.06 95 / 0.65);
+  }
+  /* Sliding active-item indicator — sits inset 5px from the track on every side
+     so its rounded ends never touch (or pass) the pill's inner rim. */
+  nav.primary .nav-thumb {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, oklch(0.42 0.14 340), oklch(0.34 0.12 250));
+    /* Floating chip: deeper drop shadows + top sheen + 1px rim */
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.35),
+      0 4px 8px oklch(0 0 0 / 0.40),
+      0 8px 20px oklch(0 0 0 / 0.45),
+      0 0 0 1px oklch(0 0 0 / 0.30),
+      inset 0 1px 0 oklch(1 0 0 / 0.30),
+      inset 0 -1px 2px oklch(0 0 0 / 0.25);
+    transform: translateX(0);
+    transition: transform .35s cubic-bezier(.65,0,.20,1), width .35s cubic-bezier(.65,0,.20,1);
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Hide thumb on initial paint until JS positions it (avoids a flash at left edge). */
+  nav.primary:not(.nav-ready) .nav-thumb { opacity: 0; }
+  nav.primary a {
+    text-decoration: none;
+    color: oklch(0.32 0.04 280);
+    font-family: "Bricolage Grotesque", "Inter Tight", sans-serif;
+    font-variation-settings: "opsz" 36;
+    font-size: 21px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 999px;
+    /* Match thumb's slide duration so color crossfades in step with the indicator. */
+    transition: color .35s cubic-bezier(.65,0,.20,1), text-shadow .35s cubic-bezier(.65,0,.20,1);
+    letter-spacing: -0.005em;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    text-shadow: 0 0 0 oklch(0 0 0 / 0);
+  }
+  nav.primary a:hover { color: oklch(0.18 0.04 280); }
+  nav.primary a[aria-current="page"] {
+    color: oklch(0.99 0.005 100);
+    text-shadow: 0 1px 2px oklch(0 0 0 / 0.45);
+  }
+
+  /* Main */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 28px 10px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+  /* Chat view becomes a bottom-anchored column when chat-active so the composer
+     ends up at the bottom and the conversation pane fills the space above it. */
+  #view-chat {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: justify-content 750ms ease;
+  }
+  body.chat-active #view-chat {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* Hero / chat intro */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 48px;
+    max-height: 600px;
+    /* overflow visible so children can slide above the viewport without being clipped
+       as the parent collapses for layout reflow. */
+    overflow: visible;
+    transition:
+      max-height 750ms cubic-bezier(.6,.0,.2,1),
+      margin 750ms cubic-bezier(.6,.0,.2,1);
+  }
+  .hero h1, .hero p.sub {
+    transition:
+      opacity 750ms ease,
+      transform 750ms cubic-bezier(.6,.0,.2,1);
+    will-change: transform, opacity;
+  }
+  body.chat-active .hero {
+    /* Pin to the hero's captured pre-transition rect so the children's slide-up
+       starts from the hero's original on-screen location, decoupled from the
+       parent flex's center→flex-end shift. position:fixed also removes the
+       hero from layout flow so conversation/composer siblings reflow cleanly. */
+    position: fixed;
+    top: var(--hero-top);
+    left: var(--hero-left);
+    width: var(--hero-width);
+    margin: 0 !important;
+    pointer-events: none;
+  }
+  body.chat-active .hero h1,
+  body.chat-active .hero p.sub {
+    opacity: 0;
+    transform: translateY(-100vh);
+  }
+  .hero h1 {
+    font-family: "Inter Tight", sans-serif;
+    font-weight: 500;
+    font-size: clamp(44px, 6.4vw, 68px);
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin: 0 0 22px;
+    color: var(--ink);
+  }
+  .hero h1 .accent {
+    background: linear-gradient(100deg,
+      oklch(0.78 0.18 340) 0%,
+      oklch(0.70 0.18 305) 50%,
+      oklch(0.74 0.16 250) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.sub {
+    font-size: clamp(18px, 1.9vw, 21px);
+    color: var(--ink-dim);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* Composer */
+  .composer-wrap {
+    position: relative;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  /* When chat-active, composer is fixed to viewport bottom-left (over the footer area).
+     The transition uses left/right/top/width which animate smoothly when their values
+     change between the relative and fixed states. We use a JS-set --src-* fallback for
+     the moment of position change so there's no jump. */
+  body.chat-active .composer-wrap {
+    position: fixed;
+    left: 28px;
+    right: auto;
+    /* Use top (not bottom) so the FLIP source rect's top value can transition
+       smoothly to the target, avoiding a top/bottom mode swap. */
+    top: calc(100vh - 56px - var(--composer-h, 160px));
+    bottom: auto;
+    width: var(--src-width, 100%);
+    max-width: none;
+    margin: 0;
+    z-index: 30;
+    transition:
+      left 750ms cubic-bezier(.6,.0,.2,1),
+      top 750ms cubic-bezier(.6,.0,.2,1);
+  }
+  /* During the brief moment we set position:fixed, the wrap snaps from its
+     in-flow rect to the source rect we capture. JS sets --src-left, --src-top,
+     --src-width as inline styles to match the original rect, then on the next
+     frame removes them so the transition runs to the bottom-left target. */
+  body.chat-active.chat-pinning .composer-wrap {
+    left: var(--src-left) !important;
+    top: var(--src-top) !important;
+    width: var(--src-width) !important;
+    transition: none !important;
+  }
+  .composer-wrap::before {
+    content: "";
+    position: absolute;
+    inset: var(--halo-inset, -8px);
+    border-radius: 26px;
+    background:
+      radial-gradient(ellipse at center,
+        oklch(1 0 0 / var(--halo-white, 0.18)) 0%,
+        oklch(1 0 0 / 0) 35%),
+      conic-gradient(from var(--halo-angle, 0deg),
+        oklch(0.74 0.26 340 / 0.85),
+        oklch(0.95 0.08 320 / 0.55),
+        oklch(0.60 0.22 305 / 0.65),
+        oklch(0.70 0.22 250 / 0.85),
+        oklch(0.92 0.06 270 / 0.50),
+        oklch(0.60 0.22 305 / 0.65),
+        oklch(0.74 0.26 340 / 0.85));
+    filter: blur(var(--halo-blur, 22px)) saturate(var(--halo-sat, 1.2));
+    z-index: -1;
+    opacity: var(--halo-opacity, 0.85);
+    transform: scale(var(--halo-scale, 1));
+    transition: filter .4s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .composer-wrap::before { /* no animation */ }
+  }
+  /* In chat-active, clip the halo so it can't bleed upward into the conversation
+     pane area. Top edge is clipped flush; sides and bottom keep their bleed.
+     Applied only after the slide transition completes (750ms) so it doesn't snap. */
+  body.chat-active .composer-wrap::before {
+    /* z-index handled by giving conversation pane a higher z (z:35 vs composer z:30) */
+  }
+  @property --halo-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+  }
+  @property --halo-inset {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: -14px;
+  }
+  @property --halo-blur {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 28px;
+  }
+  @property --halo-opacity {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0.85;
+  }
+  @property --halo-scale {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 1;
+  }
+  @property --halo-sat {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 1.2;
+  }
+  @property --halo-white {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0.18;
+  }
+  .composer {
+    background: oklch(0.18 0.035 280 / 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 18px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow:
+      0 1px 0 oklch(1 0 0 / 0.04) inset,
+      0 30px 60px -20px oklch(0 0 0 / 0.5);
+    transition:
+      border-color .2s ease,
+      border-top-left-radius 750ms cubic-bezier(.6,.0,.2,1),
+      border-top-right-radius 750ms cubic-bezier(.6,.0,.2,1);
+  }
+  .composer:focus-within { border-color: oklch(1 0 0 / 0.14); }
+
+  /* In chat-active, flatten the seam between conversation pane and composer
+     so they read as one continuous surface. Halo on composer stays intact. */
+  body.chat-active .conversation {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 0;
+    box-shadow:
+      0 12px 36px oklch(0 0 0 / 0.45),
+      inset 0 1px 0 oklch(1 0 0 / 0.5);
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+  body.chat-active .composer {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  textarea.input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: "Inter Tight", sans-serif;
+    font-size: 18px;
+    line-height: 1.55;
+    resize: none;
+    padding: 4px 6px;
+    min-height: calc(1.55em * 3);
+  }
+  textarea.input::placeholder { color: var(--ink-mute); }
+
+  .composer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid oklch(1 0 0 / 0.06);
+  }
+  .hint {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 17px;
+    color: var(--ink-mute);
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hint kbd {
+    background: oklch(1 0 0 / 0.06);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 7px;
+    padding: 1px 8px;
+    font-family: inherit;
+    font-size: 19px;
+    line-height: 1.3;
+    color: var(--ink-dim);
+  }
+  .send {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    color: white;
+    font-family: "Inter Tight", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(120deg,
+      oklch(0.62 0.22 340) 0%,
+      oklch(0.55 0.18 305) 50%,
+      oklch(0.58 0.18 250) 100%);
+    box-shadow:
+      0 0 0 1px oklch(1 0 0 / 0.10) inset,
+      0 6px 18px -4px oklch(0.55 0.20 340 / 0.45),
+      0 6px 18px -4px oklch(0.50 0.18 250 / 0.35);
+    transition: transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .send:hover { transform: translateY(-1px); }
+  .send:active { transform: translateY(0); }
+  .send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .send svg { width: 16px; height: 16px; }
+
+  /* Suggested prompts */
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+    justify-content: center;
+  }
+  .chip {
+    appearance: none;
+    border: 1px solid oklch(1 0 0 / 0.08);
+    background: oklch(1 0 0 / 0.025);
+    color: var(--ink-dim);
+    font-family: "Inter Tight", sans-serif;
+    font-size: 14.5px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover {
+    color: var(--ink);
+    border-color: oklch(0.70 0.22 340 / 0.4);
+    background: oklch(0.70 0.22 340 / 0.06);
+  }
+
+  /* Conversation */
+  .conversation {
+    display: none;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+  .conversation.active { display: flex; }
+
+  /* Conversation pane: in chat-active, it becomes the flexible filler between
+     the (collapsed) hero and the composer, taking all remaining vertical space. */
+  body.chat-active .conversation {
+    position: fixed;
+    left: 28px;
+    right: auto;
+    top: var(--header-h, 88px);
+    bottom: calc(56px + var(--composer-h, 160px));
+    width: var(--src-width, 480px);
+    max-width: none;
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 18px;
+    /* Dark purplish, slightly brighter than the composer (composer is L=0.18). */
+    background: oklch(0.22 0.045 285);
+    border: 1px solid oklch(0.30 0.05 285);
+    border-radius: 0;
+    box-shadow:
+      0 12px 36px oklch(0 0 0 / 0.45),
+      inset 0 1px 0 oklch(1 0 0 / 0.05),
+      inset 0 -1px 0 oklch(0 0 0 / 0.3);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 36px, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, black 36px, black 100%);
+    z-index: 35;
+    /* Bottom-align messages without breaking scroll: a flex spacer ::before
+       takes any unused space, so children stack at the bottom while overflow
+       still scrolls naturally. */
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+      transform 750ms cubic-bezier(.6,.0,.2,1),
+      opacity 750ms cubic-bezier(.6,.0,.2,1);
+  }
+  body.chat-active.chat-pinning .conversation {
+    transform: translateY(-100vh);
+    opacity: 0;
+    transition: none !important;
+  }
+  body.chat-active .conversation::before {
+    content: "";
+    flex: 1 0 auto;
+  }
+  /* Static purple halo on the LEFT and RIGHT of the conversation pane,
+     mirroring the composer's chat-active halo size (~4px reach). Top and
+     bottom edges stay flush so the pane reads continuous with the composer. */
+  /* Conversation pane halo intentionally removed — the composer halo
+     handles all the glow during the slide-down transition. */
+  .conv-halo { display: none !important; }
+  body.chat-active .conversation {
+    box-shadow:
+      0 12px 36px oklch(0 0 0 / 0.45),
+      inset 0 1px 0 oklch(1 0 0 / 0.05),
+      inset 0 -1px 0 oklch(0 0 0 / 0.3);
+  }
+  body.chat-active .conversation::after {
+    display: none;
+  }
+     Two thin gradient strips (left + right) painted on a fixed div, so the
+     glow is contained to the sides only and isn't clipped by the conversation's
+     overflow:auto. Slides in with the conversation via the same transition. */
+  .conv-halo { display: none; }
+  body.chat-active .conv-halo {
+    display: block;
+    position: fixed;
+    left: calc(28px - 14px);
+    top: var(--header-h, 88px);
+    bottom: calc(56px + var(--composer-h, 160px));
+    width: calc(var(--src-width, 480px) + 28px);
+    pointer-events: none;
+    z-index: 34;
+    /* Left + right glow strips. Each strip is ~14px wide, fades OUTWARD from
+       the conversation's edge (saturated near the pane → transparent away).
+       Strips are positioned 14px in from each edge of this halo div, since
+       the div itself extends 14px beyond the pane on each side. */
+    background:
+      /* Left strip: 14px wide at the LEFT edge of this halo div (which extends
+         14px beyond the conv on the left). "to left" = bright color is on the
+         RIGHT side of the strip, i.e. flush with the conv's left edge. */
+      linear-gradient(to left,
+        oklch(0.74 0.26 340 / 0.22) 0,
+        oklch(0.65 0.24 320 / 0.14) 4px,
+        oklch(0.65 0.24 320 / 0) 14px) 0 0 / 14px 100% no-repeat,
+      /* Right strip: 14px wide at the RIGHT edge of this halo div. "to right"
+         = bright color is on the LEFT side, i.e. flush with the conv's right edge. */
+      linear-gradient(to right,
+        oklch(0.74 0.26 340 / 0.22) 0,
+        oklch(0.65 0.24 320 / 0.14) 4px,
+        oklch(0.65 0.24 320 / 0) 14px) right 0 top / 14px 100% no-repeat;
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+      transform 750ms cubic-bezier(.6,.0,.2,1),
+      opacity 750ms cubic-bezier(.6,.0,.2,1);
+  }
+  body.chat-active.chat-pinning .conv-halo {
+    transform: translateY(-100vh);
+    opacity: 0;
+    transition: none !important;
+  }
+  body.chat-active .conversation {
+    box-shadow:
+      0 12px 36px oklch(0 0 0 / 0.45),
+      inset 0 1px 0 oklch(1 0 0 / 0.05),
+      inset 0 -1px 0 oklch(0 0 0 / 0.3);
+  }
+  body.chat-active .conversation::after {
+    display: none;
+  }
+  /* Slide message pane down from above the viewport into place. */
+  @keyframes convMaterialize {
+    from { opacity: 0; transform: translateY(-100vh); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Bubble & role color overrides for cream surface */
+  /* Bubble overrides for the dark purple chat surface — bubbles now
+     sit on a slightly-brighter-than-composer surface, so we need a touch
+     more contrast on each bubble (user = solid, bot = gradient). */
+  body.chat-active .msg .role { color: oklch(0.70 0.04 285); }
+  body.chat-active .msg.user .bubble {
+    background: oklch(0.27 0.04 285);
+    border: 1px solid oklch(1 0 0 / 0.06);
+    color: var(--ink);
+  }
+  body.chat-active .msg.bot .bubble {
+    background: linear-gradient(140deg, oklch(0.26 0.05 285 / 0.9), oklch(0.24 0.06 280 / 0.9));
+    border: 1px solid oklch(1 0 0 / 0.07);
+    color: var(--ink);
+  }
+  body.chat-active .msg.user .bubble-avatar {
+    background: oklch(0.34 0.04 285);
+    color: var(--ink-dim);
+  }
+  .msg {
+    display: flex;
+    gap: 14px;
+    max-width: 100%;
+    animation: msgIn .3s ease;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg .bubble-avatar {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .msg.user .bubble-avatar {
+    background: oklch(0.30 0.04 285);
+    color: var(--ink-dim);
+  }
+  .msg.bot .bubble-avatar {
+    background: conic-gradient(from 200deg,
+      oklch(0.70 0.22 340), oklch(0.55 0.18 305), oklch(0.66 0.18 250), oklch(0.70 0.22 340));
+    color: white;
+    box-shadow: 0 0 14px oklch(0.55 0.20 340 / 0.4);
+  }
+  .bubble {
+    padding: 12px 14px;
+    border-radius: 14px;
+    line-height: 1.55;
+    font-size: 17px;
+    color: var(--ink);
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bubble .msg-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bubble .msg-body {
+    /* Message text */
+  }
+  .msg.user .bubble {
+    background: oklch(0.24 0.035 285);
+    border: 1px solid oklch(1 0 0 / 0.05);
+  }
+  .msg.bot .bubble {
+    background: linear-gradient(140deg, oklch(0.22 0.04 285 / 0.85), oklch(0.20 0.05 280 / 0.85));
+    border: 1px solid oklch(1 0 0 / 0.06);
+  }
+  .msg .role {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13.5px;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: block;
+  }
+
+  /* Typing dots */
+  .typing { display: inline-flex; gap: 4px; align-items: center; height: 1.55em; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: var(--ink-mute);
+    animation: typing 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  /* Archive page */
+  .archive-page { display: none; flex-direction: column; gap: 28px; flex: 1; min-height: 0; }
+  .archive-page.active { display: flex; }
+  .archive-page h1 {
+    font-size: clamp(40px, 5.2vw, 54px);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    margin: 60px 0 4px;
+    line-height: 1.1;
+  }
+  .archive-page .lede {
+    color: var(--ink-dim);
+    font-size: 18px;
+    margin: 0 0 8px;
+    max-width: 540px;
+  }
+  .archive-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    border-top: 1px solid var(--line);
+    margin-top: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .archive-item {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 22px 4px;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background .15s ease, padding .15s ease;
+    cursor: pointer;
+  }
+  .archive-item:hover {
+    background: oklch(1 0 0 / 0.02);
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .archive-item .date {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+  .archive-item .title {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .archive-item .meta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-mute);
+  }
+  .archive-item .preview {
+    font-size: 15px;
+    color: var(--ink-dim);
+    margin-top: 4px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Footer note */
+  .foot {
+    margin-top: auto;
+    padding-top: 60px;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 40px 20px 10px; }
+    .hero { margin-top: 30px; }
+    .header-inner { padding: 12px 18px; }
+    .brand-name { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg-stage" id="bgStage" aria-hidden="true"></div>
+  <header class="site">
+    <div class="header-inner">
+      <a class="brand" data-route="/" href="/">
+        <span class="avatar" aria-hidden="true">
+          <span class="avatar-inner">
+            <img src="data:image/jpeg;base64,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" alt="Kevin J. Dolan" />
+          </span>
+        </span>
+        <span class="brand-name">Kevin J. Dolan</span>
+      </a>
+      <nav class="primary" aria-label="Primary">
+        <span class="nav-thumb" aria-hidden="true"></span>
+        <a data-route="/" href="/">KevinBot</a>
+        <a data-route="/archive/" href="/archive/">Archive</a>
+        <a data-route="/contact/" href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== Chat view ===== -->
+    <section id="view-chat">
+      <div class="hero" id="hero">
+        <h1>Chat with <span class="accent">KevinBot</span></h1>
+        <p class="sub">Kevin J. Dolan is an Agentic AI expert based in Los Angeles.</p>
+      </div>
+
+      <div class="conv-halo" aria-hidden="true"></div>
+      <div class="conversation" id="conversation"></div>
+
+      <form class="composer-wrap" id="composerForm" autocomplete="off">
+        <div class="composer">
+          <textarea
+            class="input"
+            id="input"
+            rows="3"
+            placeholder="Ask Me Anything"
+            spellcheck="true"
+          ></textarea>
+          <div class="composer-row">
+            <span class="hint" id="sendHint"></span>
+            <button class="send" type="submit" id="send">
+              Send
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 8h12M9 3l5 5-5 5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+
+
+    </section>
+
+    <!-- ===== Archive view ===== -->
+    <section class="archive-page" id="view-archive">
+      <h1>Archive</h1>
+      <p class="lede">Notes, essays, and field reports on agents, evaluations, and the messier parts of building with LLMs.</p>
+      <div class="archive-list" id="archiveList"></div>
+    </section>
+
+    <div class="foot">/// LA · est. 1988 · v0.1</div>
+  </main>
+
+<script>
+  // ---------- Animated background (Perlin-noise driven) ----------
+  (function() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const stage = document.getElementById('bgStage');
+    if (!stage) return;
+
+    // Classic Perlin noise (Ken Perlin, improved). 2D → [-1,1]
+    const perm = new Uint8Array(512);
+    (function seed() {
+      const p = new Uint8Array(256);
+      for (let i = 0; i < 256; i++) p[i] = i;
+      let s = 1337;
+      const rand = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+      for (let i = 255; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [p[i], p[j]] = [p[j], p[i]];
+      }
+      for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+    })();
+    const fade = t => t * t * t * (t * (t * 6 - 15) + 10);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const grad = (h, x, y) => ((h & 1) ? x : -x) + ((h & 2) ? y : -y);
+    function noise2(x, y) {
+      const xi = Math.floor(x) & 255, yi = Math.floor(y) & 255;
+      const xf = x - Math.floor(x), yf = y - Math.floor(y);
+      const u = fade(xf), v = fade(yf);
+      const aa = perm[perm[xi] + yi], ab = perm[perm[xi] + yi + 1];
+      const ba = perm[perm[xi + 1] + yi], bb = perm[perm[xi + 1] + yi + 1];
+      const x1 = lerp(grad(aa, xf, yf), grad(ba, xf - 1, yf), u);
+      const x2 = lerp(grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1), u);
+      return lerp(x1, x2, v);
+    }
+    const n01 = (x, y) => Math.max(0, Math.min(1, noise2(x, y) * 0.7 + 0.5));
+
+    // Bi-lighting palette — mostly bi-lighting hues, with minority whites and warm reddish-yellows.
+    // weight = relative spawn frequency.
+    const PALETTE = [
+      { l: 0.62, c: 0.22, h: 340, weight: 5 },  // hot pink
+      { l: 0.55, c: 0.20, h: 320, weight: 5 },  // magenta
+      { l: 0.50, c: 0.18, h: 305, weight: 5 },  // violet
+      { l: 0.50, c: 0.18, h: 280, weight: 5 },  // indigo
+      { l: 0.55, c: 0.18, h: 250, weight: 5 },  // blue
+      { l: 0.60, c: 0.20, h: 235, weight: 4 },  // cyan-blue
+      // Minority warm accents
+      { l: 0.62, c: 0.18, h: 45,  weight: 1 },  // amber / reddish-yellow
+      { l: 0.58, c: 0.20, h: 25,  weight: 1 },  // warm red-orange
+      // Minority near-whites (very low chroma)
+      { l: 0.88, c: 0.02, h: 320, weight: 1 },  // cool white
+      { l: 0.90, c: 0.03, h: 60,  weight: 1 },  // warm white
+    ];
+    const PALETTE_TOTAL_WEIGHT = PALETTE.reduce((s, p) => s + p.weight, 0);
+    function pickPalette() {
+      let r = Math.random() * PALETTE_TOTAL_WEIGHT;
+      for (const p of PALETTE) {
+        r -= p.weight;
+        if (r <= 0) return p;
+      }
+      return PALETTE[0];
+    }
+
+    const MIN_BLOBS = 11;
+    const MAX_BLOBS = 13;
+    const TARGET_BLOBS = 12;
+    const LIFETIME_RANGE = [40, 80]; // seconds, slow
+    const FADE_TIME = 8; // seconds for fade-in / fade-out
+    const RETIRE_TIME = 6; // seconds to shrink + fade when retired
+
+    let nextBlobId = 0;
+    const blobs = [];
+
+    function rand(min, max) { return min + Math.random() * (max - min); }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function spawnBlob() {
+      const id = nextBlobId++;
+      const palette = pickPalette();
+      // Slight hue jitter
+      const h = palette.h + rand(-12, 12);
+      const l = palette.l + rand(-0.04, 0.04);
+      const c = palette.c + rand(-0.03, 0.02);
+
+      // Spawn mode: 'edge' enters from off-screen and settles inside; 'inplace' fades in mid-screen.
+      // Either way, we keep the blob inside the visible region for most of its life.
+      const mode = Math.random() < 0.5 ? 'edge' : 'inplace';
+      let sx, sy, ex, ey;
+      if (mode === 'edge') {
+        const startSide = Math.floor(Math.random() * 4); // 0=left,1=right,2=top,3=bottom
+        // Start just off-screen, end somewhere comfortably inside (15-85%)
+        if (startSide === 0)      { sx = -15; sy = rand(10, 90); ex = rand(15, 85); ey = rand(10, 90); }
+        else if (startSide === 1) { sx = 115; sy = rand(10, 90); ex = rand(15, 85); ey = rand(10, 90); }
+        else if (startSide === 2) { sx = rand(10, 90); sy = -15; ex = rand(10, 90); ey = rand(15, 85); }
+        else                      { sx = rand(10, 90); sy = 115; ex = rand(10, 90); ey = rand(15, 85); }
+      } else {
+        // Form internally, drift only a little, stay inside
+        sx = rand(15, 85); sy = rand(15, 85);
+        ex = clamp(sx + rand(-15, 15), 15, 85);
+        ey = clamp(sy + rand(-15, 15), 15, 85);
+      }
+
+      const el = document.createElement('div');
+      el.className = 'bg-blob';
+      el.style.opacity = '0';
+      stage.appendChild(el);
+
+      const blob = {
+        id, el,
+        born: performance.now() / 1000,
+        life: rand(LIFETIME_RANGE[0], LIFETIME_RANGE[1]),
+        sx, sy, ex, ey,
+        baseSize: rand(28, 72), // vmax
+        sizeJitter: rand(8, 22),
+        peakAlpha: rand(0.10, 0.26),
+        mode,
+        h, l, c,
+        // Per-blob noise offsets so each evolves independently
+        nOffX: rand(0, 1000),
+        nOffY: rand(0, 1000),
+        nOffR: rand(0, 1000),
+        nOffH: rand(0, 1000),
+        // Slow, varied evolution speeds
+        vx: rand(0.015, 0.035),
+        vr: rand(0.020, 0.045),
+        vh: rand(0.010, 0.025),
+        retiring: false,
+      };
+      blobs.push(blob);
+      return blob;
+    }
+
+    function retireBlob(b) {
+      if (b.retiring) return;
+      b.retiring = true;
+      b.retireStart = performance.now() / 1000;
+      b.retireDuration = RETIRE_TIME;
+    }
+
+    // Initial population
+    for (let i = 0; i < TARGET_BLOBS; i++) {
+      const b = spawnBlob();
+      // Stagger so they're not all at age 0
+      b.born -= rand(0, b.life * 0.6);
+    }
+
+    // ---- Coverage-driven population control ----
+    // Sample a coarse grid across the viewport and check what fraction of cells have at least
+    // one blob whose footprint covers them. We track each blob's current x/y/size/alpha in
+    // `b.cur` (set by the render tick). If coverage < 80% we spawn more; if >> 95% we retire.
+    const COVERAGE_TARGET = 0.80;
+    const COVERAGE_HIGH = 0.95;
+    const HARD_CEIL = 24;
+    const HARD_FLOOR = 8;
+    const ALPHA_VIS_THRESHOLD = 0.04; // below this, blob doesn't meaningfully cover
+
+    function estimateCoverage() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const vmax = Math.max(vw, vh);
+      const cols = 18, rows = 10;
+      let covered = 0, total = 0;
+
+      // Snapshot active blobs with current footprint info
+      const active = blobs.filter(b => !b.retiring && b.cur && b.cur.alpha >= ALPHA_VIS_THRESHOLD);
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          // cell center in viewport % coords
+          const px = ((c + 0.5) / cols) * 100;
+          const py = ((r + 0.5) / rows) * 100;
+          // cell center in viewport pixels
+          const ppx = (px / 100) * vw;
+          const ppy = (py / 100) * vh;
+          total++;
+
+          let hit = false;
+          for (const b of active) {
+            // blob center in pixels
+            const bx = (b.cur.x / 100) * vw;
+            const by = (b.cur.y / 100) * vh;
+            // blob radius in pixels (size is in vmax → its width)
+            const radPx = (b.cur.size / 100) * vmax * 0.5;
+            const dx = bx - ppx;
+            const dy = by - ppy;
+            // Effective coverage radius: about 60% of the gradient's full extent
+            // is solid enough to "count" as coverage given the 24px page blur.
+            const effR = radPx * 0.62;
+            if (dx * dx + dy * dy <= effR * effR) { hit = true; break; }
+          }
+          if (hit) covered++;
+        }
+      }
+      return total === 0 ? 0 : covered / total;
+    }
+
+    function maintainCoverage() {
+      const cov = estimateCoverage();
+      const activeCount = blobs.filter(b => !b.retiring).length;
+      if (cov < COVERAGE_TARGET && activeCount < HARD_CEIL) {
+        // Spawn just one or two at a time so the bg evolves rather than slamming
+        const deficit = COVERAGE_TARGET - cov;
+        const toAdd = deficit > 0.15 ? 2 : 1;
+        for (let i = 0; i < toAdd && (blobs.filter(b => !b.retiring).length) < HARD_CEIL; i++) {
+          spawnBlob();
+        }
+      } else if (cov > COVERAGE_HIGH && activeCount > HARD_FLOOR) {
+        // Retire the oldest one to keep the scene from overcrowding
+        const candidates = blobs.filter(b => !b.retiring).sort((a, b) => a.born - b.born);
+        if (candidates.length) retireBlob(candidates[0]);
+      }
+    }
+    setInterval(maintainCoverage, 2000);
+    // Re-check coverage on resize since cell layout / coverage shifts with viewport
+    window.addEventListener('resize', () => {
+      // small debounce
+      clearTimeout(window.__covT);
+      window.__covT = setTimeout(maintainCoverage, 250);
+    });
+
+    function tick() {
+      const now = performance.now() / 1000;
+      for (let i = blobs.length - 1; i >= 0; i--) {
+        const b = blobs[i];
+        const age = now - b.born;
+        const lifeT = age / b.life; // 0..1
+
+        // Lifetime fade envelope (smooth ease in/out)
+        let envelope;
+        const fadeFrac = Math.min(0.4, FADE_TIME / b.life);
+        if (lifeT < fadeFrac) {
+          const k = lifeT / fadeFrac;
+          envelope = k * k * (3 - 2 * k);
+        } else if (lifeT > 1 - fadeFrac) {
+          const k = (1 - lifeT) / fadeFrac;
+          envelope = Math.max(0, k * k * (3 - 2 * k));
+        } else {
+          envelope = 1;
+        }
+
+        // Retirement envelope: shrink + fade to zero independent of natural life
+        let retireFactor = 1;
+        if (b.retiring) {
+          const retireT = (now - b.retireStart) / b.retireDuration;
+          if (retireT >= 1) {
+            b.el.remove();
+            blobs.splice(i, 1);
+            continue;
+          }
+          const k = 1 - retireT;
+          retireFactor = k * k * (3 - 2 * k); // smoothstep → 0
+        }
+
+        if (lifeT >= 1) {
+          b.el.remove();
+          blobs.splice(i, 1);
+          continue;
+        }
+
+        // Position: blend linear drift (sx,sy)→(ex,ey) with gentle noise wobble
+        const wobX = (n01(b.nOffX + now * b.vx, 0) - 0.5) * 10;
+        const wobY = (n01(0, b.nOffY + now * b.vx) - 0.5) * 10;
+        const t = lifeT;
+        const eased = t * t * (3 - 2 * t);
+        const x = b.sx + (b.ex - b.sx) * eased + wobX;
+        const y = b.sy + (b.ey - b.sy) * eased + wobY;
+
+        // Size: base + noise jitter; inplace blobs ramp up from a small radius
+        const sizeN = n01(b.nOffR + now * b.vr, 50);
+        let size = b.baseSize + (sizeN - 0.5) * 2 * b.sizeJitter;
+        if (b.mode === 'inplace') {
+          // Slow ramp from 30% → 100% size over the first half of life
+          const ramp = Math.min(1, lifeT / 0.5);
+          const eased = ramp * ramp * (3 - 2 * ramp);
+          size *= 0.30 + 0.70 * eased;
+        }
+
+        // Hue drift (subtle, within bi-lighting band)
+        const hueN = n01(b.nOffH + now * b.vh, 100);
+        const h = b.h + (hueN - 0.5) * 2 * 14;
+
+        const alpha = b.peakAlpha * envelope * retireFactor;
+
+        b.el.style.left = x + '%';
+        b.el.style.top = y + '%';
+        b.el.style.width = (size * retireFactor) + 'vmax';
+        b.el.style.height = (size * retireFactor) + 'vmax';
+        b.el.style.opacity = alpha.toFixed(3);
+        b.el.style.background = `radial-gradient(circle at center, oklch(${b.l} ${b.c} ${h.toFixed(1)}) 0%, oklch(${b.l} ${b.c} ${h.toFixed(1)} / 0.5) 35%, transparent 70%)`;
+
+        // Snapshot current footprint for coverage estimation
+        b.cur = { x, y, size: size * retireFactor, alpha };
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
+  // ---------- Composer halo pulse (JS-driven, irregular) ----------
+  (function() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const wrap = document.querySelector('.composer-wrap');
+    const input = document.getElementById('input');
+    if (!wrap) return;
+
+    // Incommensurate frequencies → non-repeating, unpredictable wobble
+    const FREQS = [0.041, 0.067, 0.103, 0.029, 0.083, 0.151];
+    const PHASES = FREQS.map(() => Math.random() * Math.PI * 2);
+
+    // Sample a smooth pseudo-random scalar in [0,1] from summed sines
+    function smoothNoise(t, seed) {
+      let s = 0, n = 0;
+      for (let i = 0; i < FREQS.length; i++) {
+        const w = 1 / (i + 1);
+        s += Math.sin(t * FREQS[i] * 2 * Math.PI + PHASES[i] + seed) * w;
+        n += w;
+      }
+      return (s / n + 1) / 2; // 0..1
+    }
+
+    // Tight ranges — focused state is brighter & more saturated than idle.
+    const RANGES = {
+      idle:    { inset: [-8,  -16], blur: [18, 24], opacity: [0.55, 0.70], scale: [0.998, 1.010], sat: [1.00, 1.20], white: [0.10, 0.18] },
+      focused: { inset: [-9,  -18], blur: [24, 34], opacity: [0.92, 1.00], scale: [1.005, 1.022], sat: [1.50, 1.80], white: [0.28, 0.45] },
+      // Chat-active: halo shrinks and fades to invisible. The 750ms blend in
+      // updateHalo() carries us smoothly from full halo to nothing as the
+      // composer settles into its docked position.
+      idleActive:    { inset: [-1, -2], blur: [4, 6],  opacity: [0, 0], scale: [0.998, 1.002], sat: [1.00, 1.00], white: [0, 0] },
+      focusedActive: { inset: [-1, -2], blur: [4, 6],  opacity: [0, 0], scale: [1.000, 1.002], sat: [1.00, 1.00], white: [0, 0] },
+    };
+
+    const t0 = performance.now() / 1000;
+    let lastT = t0;
+    let focusBlend = 0; // 0 = idle, 1 = focused
+    let activeBlend = 0; // 0 = pre-chat, 1 = chat-active. Eased over ~750ms.
+    let angleDeg = 0;   // accumulated rotation
+    // Asymmetric: brighten ~500ms on focus, darken ~250ms on blur. τ ≈ T/3 to reach ~95%.
+    const TAU_FOCUS_IN = 0.167;
+    const TAU_FOCUS_OUT = 0.083;
+    // Chat-active transition matches the 750ms slide. τ ≈ 0.25s reaches ~95% in 750ms.
+    const TAU_ACTIVE = 0.25;
+    const SPIN_IDLE = 30;     // deg/sec  (≈ 12s/rev)
+    const SPIN_FOCUSED = 48;  // deg/sec  (≈ 7.5s/rev)
+
+    function frame() {
+      const now = performance.now() / 1000;
+      const t = now - t0;
+      const dt = Math.min(0.1, now - lastT); // clamp dt for tab-switch hiccups
+      lastT = now;
+
+      // Exponential smoothing toward target focus state — frame-rate independent.
+      // Use a faster time-constant on the way out so darkening completes in ~250ms.
+      const target = wrap.matches(':focus-within') ? 1 : 0;
+      const tau = target > focusBlend ? TAU_FOCUS_IN : TAU_FOCUS_OUT;
+      const k = 1 - Math.exp(-dt / tau);
+      focusBlend += (target - focusBlend) * k;
+
+      // Continuous-velocity rotation: spin rate eases with focusBlend, no angle jump
+      const spin = SPIN_IDLE + (SPIN_FOCUSED - SPIN_IDLE) * focusBlend;
+      angleDeg = (angleDeg + spin * dt) % 360;
+
+      // Linearly interpolate each range bound between idle and focused by focusBlend.
+      // When chat is active, smoothly blend between pre-chat ranges and chat-active
+      // ranges via activeBlend (eased over ~750ms).
+      const lerp = (a, b) => a + (b - a) * focusBlend;
+      const lerpA = (a, b) => a + (b - a) * activeBlend;
+      const targetActive = document.body.classList.contains('chat-active') ? 1 : 0;
+      activeBlend += (targetActive - activeBlend) * (1 - Math.exp(-dt / TAU_ACTIVE));
+      const idleR = {
+        inset:   [lerpA(RANGES.idle.inset[0],   RANGES.idleActive.inset[0]),   lerpA(RANGES.idle.inset[1],   RANGES.idleActive.inset[1])],
+        blur:    [lerpA(RANGES.idle.blur[0],    RANGES.idleActive.blur[0]),    lerpA(RANGES.idle.blur[1],    RANGES.idleActive.blur[1])],
+        opacity: [lerpA(RANGES.idle.opacity[0], RANGES.idleActive.opacity[0]), lerpA(RANGES.idle.opacity[1], RANGES.idleActive.opacity[1])],
+        scale:   [lerpA(RANGES.idle.scale[0],   RANGES.idleActive.scale[0]),   lerpA(RANGES.idle.scale[1],   RANGES.idleActive.scale[1])],
+        sat:     [lerpA(RANGES.idle.sat[0],     RANGES.idleActive.sat[0]),     lerpA(RANGES.idle.sat[1],     RANGES.idleActive.sat[1])],
+        white:   [lerpA(RANGES.idle.white[0],   RANGES.idleActive.white[0]),   lerpA(RANGES.idle.white[1],   RANGES.idleActive.white[1])],
+      };
+      const focusedR = {
+        inset:   [lerpA(RANGES.focused.inset[0],   RANGES.focusedActive.inset[0]),   lerpA(RANGES.focused.inset[1],   RANGES.focusedActive.inset[1])],
+        blur:    [lerpA(RANGES.focused.blur[0],    RANGES.focusedActive.blur[0]),    lerpA(RANGES.focused.blur[1],    RANGES.focusedActive.blur[1])],
+        opacity: [lerpA(RANGES.focused.opacity[0], RANGES.focusedActive.opacity[0]), lerpA(RANGES.focused.opacity[1], RANGES.focusedActive.opacity[1])],
+        scale:   [lerpA(RANGES.focused.scale[0],   RANGES.focusedActive.scale[0]),   lerpA(RANGES.focused.scale[1],   RANGES.focusedActive.scale[1])],
+        sat:     [lerpA(RANGES.focused.sat[0],     RANGES.focusedActive.sat[0]),     lerpA(RANGES.focused.sat[1],     RANGES.focusedActive.sat[1])],
+        white:   [lerpA(RANGES.focused.white[0],   RANGES.focusedActive.white[0]),   lerpA(RANGES.focused.white[1],   RANGES.focusedActive.white[1])],
+      };
+      const r = {
+        inset:   [lerp(idleR.inset[0],   focusedR.inset[0]),   lerp(idleR.inset[1],   focusedR.inset[1])],
+        blur:    [lerp(idleR.blur[0],    focusedR.blur[0]),    lerp(idleR.blur[1],    focusedR.blur[1])],
+        opacity: [lerp(idleR.opacity[0], focusedR.opacity[0]), lerp(idleR.opacity[1], focusedR.opacity[1])],
+        scale:   [lerp(idleR.scale[0],   focusedR.scale[0]),   lerp(idleR.scale[1],   focusedR.scale[1])],
+        sat:     [lerp(idleR.sat[0],     focusedR.sat[0]),     lerp(idleR.sat[1],     focusedR.sat[1])],
+        white:   [lerp(idleR.white[0],   focusedR.white[0]),   lerp(idleR.white[1],   focusedR.white[1])],
+      };
+
+      // Each property gets a different seed so they evolve independently
+      const ni = smoothNoise(t, 0.0);
+      const nb = smoothNoise(t, 1.7);
+      const no = smoothNoise(t, 3.3);
+      const ns = smoothNoise(t, 5.1);
+      const nt = smoothNoise(t, 7.2);
+      const nw = smoothNoise(t, 9.4);
+
+      const inset = r.inset[0] + (r.inset[1] - r.inset[0]) * ni;
+      const blur  = r.blur[0]  + (r.blur[1]  - r.blur[0])  * nb;
+      const op    = r.opacity[0]+ (r.opacity[1]- r.opacity[0])* no;
+      const sc    = r.scale[0] + (r.scale[1] - r.scale[0]) * ns;
+      const sat   = r.sat[0]   + (r.sat[1]   - r.sat[0])   * nt;
+      const wh    = r.white[0] + (r.white[1] - r.white[0]) * nw;
+
+      wrap.style.setProperty('--halo-inset', inset.toFixed(2) + 'px');
+      wrap.style.setProperty('--halo-blur', blur.toFixed(2) + 'px');
+      wrap.style.setProperty('--halo-opacity', op.toFixed(3));
+      wrap.style.setProperty('--halo-scale', sc.toFixed(4));
+      wrap.style.setProperty('--halo-sat', sat.toFixed(3));
+      wrap.style.setProperty('--halo-white', wh.toFixed(3));
+      wrap.style.setProperty('--halo-angle', angleDeg.toFixed(2) + 'deg');
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // ---------- Routing ----------
+  const views = {
+    chat: document.getElementById('view-chat'),
+    archive: document.getElementById('view-archive'),
+  };
+  const navLinks = document.querySelectorAll('[data-route]');
+
+  function setRoute(path, push = true) {
+    const isArchive = path.startsWith('/archive');
+    const isContact = path.startsWith('/contact');
+    views.chat.style.display = (isArchive || isContact) ? 'none' : '';
+    views.archive.classList.toggle('active', isArchive);
+
+    navLinks.forEach(l => {
+      const lr = l.getAttribute('data-route');
+      const match = isArchive ? lr === '/archive/' : isContact ? lr === '/contact/' : lr === '/';
+      // Mark only top-nav anchors as current; the brand link stays unmarked
+      if (l.classList.contains('brand')) return;
+      if (match) l.setAttribute('aria-current', 'page');
+      else l.removeAttribute('aria-current');
+    });
+
+    // Slide the nav thumb to the active item
+    const nav = document.querySelector('nav.primary');
+    const thumb = nav && nav.querySelector('.nav-thumb');
+    const active = nav && nav.querySelector('a[aria-current="page"]');
+    if (nav && thumb && active) {
+      // Position the thumb so it covers exactly the active link's text-button area,
+      // inset 5px from the pill on every side so its rounded caps never touch the rim.
+      const navRect = nav.getBoundingClientRect();
+      const aRect = active.getBoundingClientRect();
+      // Thumb's `left:0; top:5; bottom:5;` means its origin is at nav-left + border (0).
+      // We want its left edge at aRect.left (in viewport coords) → translate by aRect.left - navRect.left.
+      const tx = aRect.left - navRect.left;
+      thumb.style.width = aRect.width + 'px';
+      thumb.style.transform = `translateX(${tx}px)`;
+      requestAnimationFrame(() => nav.classList.add('nav-ready'));
+    }
+
+    if (push) {
+      const target = isArchive ? '/archive/' : isContact ? '/contact/' : '/';
+      if (location.pathname !== target) {
+        history.pushState({}, '', target);
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      setRoute(a.getAttribute('data-route'));
+    });
+  });
+  window.addEventListener('popstate', () => setRoute(location.pathname, false));
+
+  // Initialize from URL
+  setRoute(location.pathname || '/', false);
+
+  // ---------- Chat ----------
+  const form = document.getElementById('composerForm');
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const hero = document.getElementById('hero');
+  const conv = document.getElementById('conversation');
+  const sendHint = document.getElementById('sendHint');
+
+  // Detect platform for keyboard hint + behavior
+  const IS_MAC = /Mac|iPod|iPhone|iPad/.test(navigator.platform) ||
+                 (navigator.userAgentData && navigator.userAgentData.platform === 'macOS');
+  const SEND_MOD_KEY = IS_MAC ? '⌘' : 'Ctrl';
+  sendHint.innerHTML = `<kbd>↵</kbd> newline &nbsp;·&nbsp; <kbd>${SEND_MOD_KEY}</kbd><kbd>↵</kbd> send`;
+
+  const SYSTEM = `You are KevinBot, a friendly AI assistant standing in for Kevin J. Dolan.
+Kevin is an expert at Agentic AI based in Los Angeles. He builds, evaluates, and reasons about
+multi-agent LLM systems, agent tooling, and production AI. Tone: warm, candid, technical but approachable,
+short paragraphs, occasional dry humor. Never invent specific personal facts (employer, family, etc.) —
+if asked something Kevin hasn't shared, say so and offer to relay the question. Keep replies concise (under 150 words unless asked).`;
+
+  const history = [];
+
+  function addMessage(role, text) {
+    const el = document.createElement('div');
+    el.className = `msg ${role}`;
+    el.innerHTML = `
+      <div class="bubble">
+        <div class="msg-head">
+          <div class="bubble-avatar">${role === 'user' ? 'You' : 'K'}</div>
+          <span class="role">${role === 'user' ? 'You' : 'KevinBot'}</span>
+        </div>
+        <div class="msg-body"></div>
+      </div>
+    `;
+    el.querySelector('.msg-body').textContent = text;
+    conv.appendChild(el);
+    conv.classList.add('active');
+    return el.querySelector('.msg-body');
+  }
+
+  function addTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg bot';
+    el.innerHTML = `
+      <div class="bubble">
+        <div class="msg-head">
+          <div class="bubble-avatar">K</div>
+          <span class="role">KevinBot</span>
+        </div>
+        <div class="msg-body"><span class="typing"><span></span><span></span><span></span></span></div>
+      </div>
+    `;
+    conv.appendChild(el);
+    conv.classList.add('active');
+    return el;
+  }
+
+  function activateChat() {
+    if (document.body.classList.contains('chat-active')) return;
+    const wrap = document.querySelector('.composer-wrap');
+    const header = document.querySelector('header.site');
+    const r = wrap.getBoundingClientRect();
+    // Capture source rect on body so both composer and conversation can read it.
+    document.body.style.setProperty('--src-left', r.left + 'px');
+    document.body.style.setProperty('--src-top', r.top + 'px');
+    document.body.style.setProperty('--src-width', r.width + 'px');
+    document.body.style.setProperty('--header-h', header.offsetHeight + 'px');
+    // Capture the hero's pre-transition rect so its children slide up from
+    // their original on-screen location (not from wherever the flex layout
+    // would otherwise drag them during the center→flex-end shift).
+    const hero = document.getElementById('hero');
+    if (hero) {
+      const hr = hero.getBoundingClientRect();
+      document.body.style.setProperty('--hero-top', hr.top + 'px');
+      document.body.style.setProperty('--hero-left', hr.left + 'px');
+      document.body.style.setProperty('--hero-width', hr.width + 'px');
+    }
+    document.body.classList.add('chat-active', 'chat-pinning');
+    input.removeAttribute('placeholder');
+    conv.classList.add('active');
+    // Remove the hero from the DOM once its slide-up + fade finishes.
+    if (hero) setTimeout(() => hero.remove(), 800);
+    // Set --composer-h so conversation pane sits flush above
+    document.body.style.setProperty('--composer-h', wrap.offsetHeight + 'px');
+    new ResizeObserver(() => {
+      document.body.style.setProperty('--composer-h', wrap.offsetHeight + 'px');
+    }).observe(wrap);
+    // Force layout so the snapped position is committed, then drop the
+    // pinning class on next frame so the transition runs to the target.
+    void wrap.offsetWidth;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove('chat-pinning');
+      });
+    });
+  }
+
+  function scrollConv() {
+    if (document.body.classList.contains('chat-active')) {
+      conv.scrollTo({ top: conv.scrollHeight, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }
+
+  async function sendMessage(text) {
+    if (!text.trim()) return;
+    const wasInactive = !document.body.classList.contains('chat-active');
+    activateChat();
+    input.value = '';
+    input.style.height = '';
+    sendBtn.disabled = true;
+
+    // On first activation, hold messages until the slide-to-corner transition
+    // finishes so emissions don't compete with the move.
+    if (wasInactive) {
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    addMessage('user', text);
+    history.push({ role: 'user', content: text });
+
+    const typingEl = addTyping();
+    scrollConv();
+
+    try {
+      const reply = await window.claude.complete({
+        messages: [
+          { role: 'user', content: SYSTEM + '\n\nConversation so far:\n' +
+            history.map(m => `${m.role === 'user' ? 'User' : 'KevinBot'}: ${m.content}`).join('\n') +
+            '\n\nKevinBot:' }
+        ]
+      });
+      typingEl.remove();
+      addMessage('bot', reply.trim());
+      history.push({ role: 'assistant', content: reply.trim() });
+    } catch (err) {
+      typingEl.remove();
+      addMessage('bot', "Hmm — I couldn't reach the model just now. Try again in a sec?");
+      console.error(err);
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+      scrollConv();
+    }
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    sendMessage(input.value);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const sendCombo = IS_MAC ? e.metaKey : e.ctrlKey;
+    if (sendCombo) {
+      e.preventDefault();
+      sendMessage(input.value);
+    }
+    // Plain Enter falls through → inserts a newline (default textarea behavior)
+  });
+
+  // Auto-grow textarea slightly past 3 rows
+  input.addEventListener('input', () => {
+    input.style.height = '';
+    const max = 220;
+    const next = Math.min(input.scrollHeight, max);
+    input.style.height = next + 'px';
+  });
+
+  // ---------- Archive (sample entries) ----------
+  const archive = [
+    { date: '2026-04-22', title: 'Notes on agent eval harnesses', meta: '8 min', preview: 'What I keep relearning about deterministic replay, golden traces, and the cost of skipping them.' },
+    { date: '2026-03-09', title: 'The cheap-model floor', meta: '6 min', preview: 'When a haiku-class model is enough, and how to know before you ship the expensive one.' },
+    { date: '2026-02-14', title: 'Tool-calling has a UX problem', meta: '11 min', preview: 'Why most tool-using agents feel uncanny — and a few patterns that helped.' },
+    { date: '2025-12-30', title: '2025 in review: agents, mostly', meta: '14 min', preview: 'A year of pretending agents would work, and the handful of times they did.' },
+    { date: '2025-11-02', title: 'Multi-agent loops without tears', meta: '9 min', preview: 'Topologies I keep coming back to, and the ones that always end in flames.' },
+    { date: '2025-09-18', title: 'Eval datasets are a product surface', meta: '7 min', preview: 'Treating your eval set like a product — versioning, ownership, taste.' },
+    { date: '2025-07-04', title: 'On leaving the framework behind', meta: '5 min', preview: 'A short defense of writing the orchestration loop yourself.' },
+  ];
+
+  const list = document.getElementById('archiveList');
+  archive.forEach(item => {
+    const a = document.createElement('a');
+    a.className = 'archive-item';
+    a.href = '#';
+    a.innerHTML = `
+      <span class="date">${item.date}</span>
+      <span>
+        <span class="title"></span>
+        <div class="preview"></div>
+      </span>
+      <span class="meta">${item.meta}</span>
+    `;
+    a.querySelector('.title').textContent = item.title;
+    a.querySelector('.preview').textContent = item.preview;
+    a.addEventListener('click', e => e.preventDefault());
+    list.appendChild(a);
+  });
+
+  // Focus input on load if on chat
+  if (location.pathname === '/' || location.pathname === '') {
+    setTimeout(() => input.focus(), 100);
+  }
+</script>
+</body>
+</html>
