@@ -1,0 +1,14 @@
+[project]
+name = "kevinjdolan-api"
+version = "0.1.0"
+description = "FastAPI backend for kevinjdolan.net"
+readme = "../README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.125.0",
+    "pydantic>=2.12.0",
+    "uvicorn[standard]>=0.38.0",
+]
+
+[tool.uv]
+package = false
